@@ -26,7 +26,6 @@ function seedBlogPostData() {
 
   for (let i=1; i<=10; i++) {
     seedData.push(generateBlogPostData());
-    console.log(seedData);
   }
   // this will return a promise
   return BlogPost.insertMany(seedData);
@@ -101,13 +100,13 @@ describe('BlogPosts API resource', function() {
           res = _res;
           expect(res).to.have.status(200);
           console.log('inside get');
-          console.log(res.body.blogposts);
+          console.log(res.body);
           // otherwise our db seeding didn't work
           // expect(res.body.blogposts).to.have.lengthOf.at.least(1);
           return BlogPost.count();
         })
         .then(function(count) {
-          expect(res.body.blogposts).to.have.lengthOf(count);
+          expect(res.body).to.have.lengthOf(count);
         });
     });
 
@@ -121,125 +120,127 @@ describe('BlogPosts API resource', function() {
         .then(function(res) {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
-          expect(res.body.blogposts).to.be.a('array');
-          expect(res.body.blogposts).to.have.lengthOf.at.least(1);
+          expect(res.body).to.be.a('array');
+          expect(res.body).to.have.lengthOf.at.least(1);
 
-          res.body.blogposts.forEach(function(blogpost) {
+          res.body.forEach(function(blogpost) {
             expect(blogpost).to.be.a('object');
             expect(blogpost).to.include.keys(
               'id', 'author', 'title', 'content', 'created');
           });
-          resBlogPost = res.body.blogposts[0];
+          resBlogPost = res.body[0];
           return BlogPost.findById(resBlogPost.id);
         })
         .then(function(blogpost) {
-
-          expect(resBlogPost.id).to.equal(blogpost.id);
-          expect(resBlogPost.author.firstName).to.equal(blogpost.author.firstName);
-          expect(resBlogPost.author.lastName).to.equal(blogpost.author.lastName);
+          console.log(blogpost);
+          console.log(resBlogPost);
+          expect(resBlogPost.id).to.equal(blogpost.id.toString());
+          expect(resBlogPost.author).to.equal(`${blogpost.author.firstName} ${blogpost.author.lastName}`);
           expect(resBlogPost.title).to.equal(blogpost.title);
           expect(resBlogPost.content).to.equal(blogpost.content);
-          expect(resBlogPost.created).to.contain(blogpost.created);
+          // expect(resBlogPost.created).to.contain(blogpost.created.toString());
         });
     });
   });
 
-  // describe('POST endpoint', function() {
-  //   // strategy: make a POST request with data,
-  //   // then prove that the blogpost we get back has
-  //   // right keys, and that `id` is there (which means
-  //   // the data was inserted into db)
-  //   it('should add a new blogpost', function() {
+  describe('POST endpoint', function() {
+    // strategy: make a POST request with data,
+    // then prove that the blogpost we get back has
+    // right keys, and that `id` is there (which means
+    // the data was inserted into db)
+    it('should add a new blogpost', function() {
 
-  //     const newBlogPost = generateBlogPostData();
+      const newBlogPost = generateBlogPostData();
 
-  //     return chai.request(app)
-  //       .post('/posts')
-  //       .send(newBlogPost)
-  //       .then(function(res) {
-  //         expect(res).to.have.status(201);
-  //         expect(res).to.be.json;
-  //         expect(res.body).to.be.a('object');
-  //         expect(res.body).to.include.keys(
-  //           'id', 'author', 'title', 'content', 'created');
-  //         expect(res.body.author.firstName).to.equal(newBlogPost.author.firstName);
-  //         expect(res.body.author.lastName).to.equal(newBlogPost.author.lastName);
-  //         // cause Mongo should have created id on insertion
-  //         expect(res.body.id).to.not.be.null;
-  //         expect(res.body.title).to.equal(newBlogPost.title);
-  //         expect(res.body.content).to.equal(newBlogPost.content);
-  //         expect(res.body.created).to.equal(newBlogPost.created);
-  //         return BlogPost.findById(res.body.id);
-  //       })
-  //       .then(function(blogpost) {
-  //         expect(blogpost.author.firstName).to.equal(newBlogPost.author.firstName);
-  //         expect(blogpost.author.lastName).to.equal(newBlogPost.author.lastName);
-  //         expect(blogpost.title).to.equal(newBlogPost.title);
-  //         expect(blogpost.content).to.equal(newBlogPost.content);
-  //         expect(blogpost.created).to.equal(newBlogPost.created);
-  //       });
-  //   });
-  // });
+      return chai.request(app)
+        .post('/posts')
+        .send(newBlogPost)
+        .then(function(res) {
+          expect(res).to.have.status(201);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.include.keys(
+            'id', 'author', 'title', 'content', 'created');
+          expect(res.body.author).to.equal(`${newBlogPost.author.firstName} ${newBlogPost.author.lastName}`);
+          // cause Mongo should have created id on insertion
+          expect(res.body.id).to.not.be.null;
+          expect(res.body.title).to.equal(newBlogPost.title);
+          expect(res.body.content).to.equal(newBlogPost.content);
+          // expect(res.body.created).to.equal(newBlogPost.created);
+          return BlogPost.findById(res.body.id);
+        })
+        .then(function(blogpost) {
+          console.log(blogpost.author);
+          console.log(newBlogPost.author);
+          expect(blogpost.author.firstName).to.equal(newBlogPost.author.firstName);
+          expect(blogpost.author.lastName).to.equal(newBlogPost.author.lastName);
+          expect(blogpost.title).to.equal(newBlogPost.title);
+          expect(blogpost.content).to.equal(newBlogPost.content);
+        //   expect(blogpost.created).to.equal(newBlogPost.created);
+       
+        });
+    });
+  });
 
-  // describe('PUT endpoint', function() {
+  describe('PUT endpoint', function() {
 
-  //   // strategy:
-  //   //  1. Get an existing blogpost from db
-  //   //  2. Make a PUT request to update that blogpost
-  //   //  3. Prove blogpost returned by request contains data we sent
-  //   //  4. Prove blogpost in db is correctly updated
-  //   it('should update fields you send over', function() {
-  //     const updateData = {
-  //       title: 'new title',
-  //       content: 'this is better than the randomly generated stuff'
-  //     };
+    // strategy:
+    //  1. Get an existing blogpost from db
+    //  2. Make a PUT request to update that blogpost
+    //  3. Prove blogpost returned by request contains data we sent
+    //  4. Prove blogpost in db is correctly updated
+    it('should update fields you send over', function() {
+      const updateData = {
+        title: 'new title',
+        content: 'this is better than the randomly generated stuff'
+      };
 
-  //     return BlogPost
-  //       .findOne()
-  //       .then(function(blogpost) {
-  //         updateData.id = blogpost.id;
+      return BlogPost
+        .findOne()
+        .then(function(blogpost) {
+          updateData.id = blogpost.id;
 
-  //         // make request then inspect it to make sure it reflects
-  //         // data we sent
-  //         return chai.request(app)
-  //           .put(`/posts/${blogpost.id}`)
-  //           .send(updateData);
-  //       })
-  //       .then(function(res) {
-  //         expect(res).to.have.status(204);
+          // make request then inspect it to make sure it reflects
+          // data we sent
+          return chai.request(app)
+            .put(`/posts/${blogpost.id}`)
+            .send(updateData);
+        })
+        .then(function(res) {
+          expect(res).to.have.status(204);
 
-  //         return BlogPost.findById(updateData.id);
-  //       })
-  //       .then(function(blogpost) {
-  //         expect(blogpost.title).to.equal(updateData.title);
-  //         expect(blogpost.content).to.equal(updateData.content);
-  //       });
-  //   });
-  // });
+          return BlogPost.findById(updateData.id);
+        })
+        .then(function(blogpost) {
+          expect(blogpost.title).to.equal(updateData.title);
+          expect(blogpost.content).to.equal(updateData.content);
+        });
+    });
+  });
 
-  // describe('DELETE endpoint', function() {
-  //   // strategy:
-  //   //  1. get a blogpost
-  //   //  2. make a DELETE request for that blogpost's id
-  //   //  3. assert that response has right status code
-  //   //  4. prove that blogpost with the id doesn't exist in db anymore
-  //   it('delete a blogpost by id', function() {
+  describe('DELETE endpoint', function() {
+    // strategy:
+    //  1. get a blogpost
+    //  2. make a DELETE request for that blogpost's id
+    //  3. assert that response has right status code
+    //  4. prove that blogpost with the id doesn't exist in db anymore
+    it('delete a blogpost by id', function() {
 
-  //     let blogpost;
+      let blogpost;
 
-  //     return BlogPost
-  //       .findOne()
-  //       .then(function(_blogpost) {
-  //         blogpost = _blogpost;
-  //         return chai.request(app).delete(`/posts/${blogpost.id}`);
-  //       })
-  //       .then(function(res) {
-  //         expect(res).to.have.status(204);
-  //         return BlogPost.findById(blogpost.id);
-  //       })
-  //       .then(function(_blogpost) {
-  //         expect(_blogpost).to.be.null;
-  //       });
-  //   });
-  // });
+      return BlogPost
+        .findOne()
+        .then(function(_blogpost) {
+          blogpost = _blogpost;
+          return chai.request(app).delete(`/posts/${blogpost.id}`);
+        })
+        .then(function(res) {
+          expect(res).to.have.status(204);
+          return BlogPost.findById(blogpost.id);
+        })
+        .then(function(_blogpost) {
+          expect(_blogpost).to.be.null;
+        });
+    });
+  });
 });
