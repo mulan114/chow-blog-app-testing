@@ -2,3 +2,10 @@ language: node_js
 node_js: node
 services:
 - mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: hWPP8FB2WCNXEv2c3Fgwv4nC7oALgjXSUmp3Yr9q3gqUQ0dDj3x1tEGc2CUBfDBQibU8pYwjPiflBBDQxT9Mtbn/fTLPR/opDQ8rOTT0Jo5akXaS5dY47FTfsEGYDMfgNyZRNMX1yUK3utR6a90AfXb6qiARBkkTgL1Ks1d3aWjHKFzYcfk5Oh1VGFu5D2r+j1YZCGFbn6NKgh3SbBi+IjewxnSq2tTaaGJRMCJqPAVt3bNpWsuUsutwgLK2Pa/0B2zP2C8aRGdyyvpnrN7MC/V8JlyIZlqHaMrPuz1n3hGvD8mmQC+2jrptm8rLlxmgoy+f//oBV6VqQOpCZ0wybS6sQW8X8+3vw8C/lcHUtJCPLy2hnWVNLsnb9geL2ACfxxvxl0vF/DtuNSUpmOu/rY3rTfE24ugU3I1Zvs/5wnqFDPAkoDsDhQQIdryVsJVbnIpNKfPNZtLWgcxA+YDMc2T6tGhEeQrsK6MI528de1hDFpFfEg3U/NLJPswGD310pKllt60JV/fQ1qyskSLZL5T9iVk2TwdXg+x2N3rCQgpddAF7d7xOR99iZgKFuWBt+QKQdO92EWaXFyXKO2S0CNj0IVdvhXy93o83/t55sK9sxf7suRu25F9qOOzaj+gEO0iX5/VsGa2oOWXSiTGBlLN7dTsaZW4nCn3d81yI0fo=
+  app: murmuring-woodland-66841
+  on:
+    repo: mulan114/chow-blog-app-testing
